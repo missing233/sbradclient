@@ -68,14 +68,17 @@ desired.
          1. Route information (option 210; not needed?)
       1. Identity Assocation for Prefix Delegation (IA-PD)
          * Sends a /56 network
-         * Internal LAN address should be set to PD prefix in this format:
-           `xxxx:xxxx:xxxx:xx00:1111:1111:1111:1111/64` (*not* on the interface
-           it received the delegation from)
+         * Internal LAN address should be set to PD prefix in this format:  
+           [1G type] `xxxx:xxxx:xxxx:xx00:1111:1111:1111:1111/64` (*not* on the interface
+           it received the delegation from)  
+           [10G type] `xxxx:xxxx:xxxx:xx00:yy:yyyy:yy00:0` (`yy:yyyy:yy` is the hexadecimal representation of your tunnel local IPv4 address)
 1. IPv6 RADIUS exchange (IPv4-in-IPv6 setup)
    * Access-Request (1) packet:
       1. RADIUS Shared Secret and Password is needed
       1. Contains IA-PD prefix as username
-         * Format is `xxxx:xxxx:xxxx:xx00:1111:1111:1111:1111`
+         * Format is  
+         [1G type] `xxxx:xxxx:xxxx:xx00:1111:1111:1111:1111`  
+         [10G type] `xxxx:xxxx:xxxx:xx00`
       1. Must contain Vendor Specific Attributes (VSA)
          * MAC Address (1)
          * Client manufacturer (2)
