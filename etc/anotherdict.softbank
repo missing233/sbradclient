@@ -1,0 +1,40 @@
+# -*- text -*-
+# SOFTBANK BB Corp. E-WMTA
+# $Id$
+VENDOR		SoftBankBB				22197
+
+BEGIN-VENDOR	SoftBankBB
+
+ATTRIBUTE	SoftBankBB-Unknown				1	octets
+ATTRIBUTE	SoftBankBB-E_WMTA-Vendor			2	string
+ATTRIBUTE	SoftBankBB-E_WMTA-Version			3	string
+ATTRIBUTE	SoftBankBB-E_WMTA-Revison			4	string
+ATTRIBUTE	SoftBankBB-Unknown				102	octets
+ATTRIBUTE	SoftBankBB-Unknown				103	octets
+ATTRIBUTE	SoftBankBB-Unknown				176	octets
+ATTRIBUTE	SoftBankBB-Unknown				178	octets
+ATTRIBUTE	SoftBankBB-Unknown				179	octets
+ATTRIBUTE	SoftBankBB-Unknown				182	octets
+ATTRIBUTE	SoftBankBB-TFTP-Server-IPv4Address		185	ipaddr
+ATTRIBUTE	SoftBankBB-Revison?				186	string
+ATTRIBUTE	SoftBankBB-Unknown				187	octets
+ATTRIBUTE	SoftBankBB-Command?				188	string
+ATTRIBUTE	SoftBankBB-Unknown-csv-1			193	string
+ATTRIBUTE	SoftBankBB-Unknown-csv-2			194	string
+ATTRIBUTE	SoftBankBB-Unknown-csv-2			195	string
+ATTRIBUTE	SoftBankBB-Unknown-v6addr-1			198	ipv6addr
+ATTRIBUTE	SoftBankBB-Unknown-v6addr-2			199	ipv6addr
+ATTRIBUTE	SoftBankBB-Unknown				200	octet
+ATTRIBUTE	SoftBankBB-Unknown-v6addr-3			201	ipv6addr
+ATTRIBUTE	SoftBankBB-NTP-IPv6Address			203	ipv6addr
+ATTRIBUTE	SoftBankBB-Tunnel-CPE-IPv4Address		204	ipaddr
+ATTRIBUTE	SoftBankBB-Tunnel-GW-IPv6Address		207	ipv6addr
+ATTRIBUTE	SoftBankBB-Unknown				208	octets
+ATTRIBUTE	SoftBankBB-Unknown				209	octets
+ATTRIBUTE	SoftBankBB-Unknown				210	octets
+ATTRIBUTE	SoftBankBB-Tunnel-GW-IPv4Address		211	ipaddr
+ATTRIBUTE	SoftBankBB-Unknown-v4mask-1			212	ipaddr
+ATTRIBUTE	SoftBankBB-Unknown-csv-3			214	string
+ATTRIBUTE	SoftBankBB-RouteInfo-Servers			215	string
+
+END-VENDOR	SoftBankBB
