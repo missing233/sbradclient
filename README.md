@@ -80,7 +80,7 @@ desired.
          [1G type] `xxxx:xxxx:xxxx:xx00:1111:1111:1111:1111`  
          [10G type] `xxxx:xxxx:xxxx:xx00`
       1. Must contain Vendor Specific Attributes (VSA)
-         * MAC Address (1)
+         * MAC Address (1) NOTE: LAN side MAC address of HGW in 10G type.  
          * Client manufacturer (2)
          * Client software version (3)
          * Client hardware revision (4)
