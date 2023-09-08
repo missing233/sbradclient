@@ -33,6 +33,11 @@
 const std::string kManufacturer = "foxconn";
 const std::string kModel = "e-wmta2.3,V5.0.0.1.rc35";
 const std::string kHwRev = "hw_rev_2.00";
+/*
+    const std::string kManufacturer = "NTT-AT";
+const std::string kModel = "BAPP";
+const std::string kHwRev = "hw_rev_1.00";
+*/
 
 constexpr int kVendorSoftbank = 22197;
 
@@ -46,20 +51,24 @@ constexpr int kSbIPv4TunnelEndpoint = 207;
 
 int radius_transact(const IpAddress &auth_server_ip,
                     const std::string &shared_secret, const IpAddress &username,
-                    const std::string &password, const std::string &mac) {
+                    const std::string &password, const std::string &mac)
+{
   unique_rc_handle rh(rc_new());
-  if (rh.get() == nullptr) {
+  if (rh.get() == nullptr)
+  {
     std::cerr << "ERROR: unable create new handle" << std::endl;
     return ERROR_RC;
   }
 
-  if (rc_config_init(rh.get()) == nullptr) {
+  if (rc_config_init(rh.get()) == nullptr)
+  {
     std::cerr << "%s: unable to init rc" << std::endl;
     return ERROR_RC;
   }
 
   if (rc_add_config(rh.get(), "dictionary", "/etc/radcli/dictionary", "config",
-                    0) != 0) {
+                    0) != 0)
+  {
     std::cerr << "ERROR: Unable to set dictionary" << std::endl;
     return ERROR_RC;
   }
@@ -69,34 +78,40 @@ int radius_transact(const IpAddress &auth_server_ip,
   auth_server += "::";
   auth_server += shared_secret;
   if (rc_add_config(rh.get(), "authserver", auth_server.c_str(), "config", 0) !=
-      0) {
+      0)
+  {
     std::cerr << "ERROR: unable to set authserver" << std::endl;
     return ERROR_RC;
   }
 
-  if (rc_add_config(rh.get(), "radius_retries", "3", "config", 0) != 0) {
+  if (rc_add_config(rh.get(), "radius_retries", "3", "config", 0) != 0)
+  {
     std::cerr << "ERROR: Unable to set radius_retries." << std::endl;
     return ERROR_RC;
   }
 
-  if (rc_add_config(rh.get(), "radius_timeout", "5", "config", 0) != 0) {
+  if (rc_add_config(rh.get(), "radius_timeout", "5", "config", 0) != 0)
+  {
     std::cerr << "ERROR: Unable to set radius_timeout." << std::endl;
     return ERROR_RC;
   }
 
-  if (rc_test_config(rh.get(), "config") != 0) {
+  if (rc_test_config(rh.get(), "config") != 0)
+  {
     std::cerr << "ERROR: config incomplete" << std::endl;
     return ERROR_RC;
   }
 
-  if (rc_read_dictionary(rh.get(), rc_conf_str(rh.get(), "dictionary")) != 0) {
+  if (rc_read_dictionary(rh.get(), rc_conf_str(rh.get(), "dictionary")) != 0)
+  {
     std::cerr << "ERROR: Failed to initialize radius dictionary" << std::endl;
     return ERROR_RC;
   }
 
   std::string dictionary_dir(SB_CLIENT_SYSCONFDIR);
   dictionary_dir += "/dictionary.softbank";
-  if (rc_read_dictionary(rh.get(), dictionary_dir.c_str()) != 0) {
+  if (rc_read_dictionary(rh.get(), dictionary_dir.c_str()) != 0)
+  {
     std::cerr << "ERROR: cannot read SoftBank dictionary from "
               << dictionary_dir << std::endl;
     return ERROR_RC;
@@ -106,7 +121,8 @@ int radius_transact(const IpAddress &auth_server_ip,
   unique_VALUE_PAIR send(rc_avpair_new(rh.get(), PW_USER_NAME,
                                        expanded_user_ip.c_str(),
                                        expanded_user_ip.size(), VENDOR_NONE));
-  if (send.get() == nullptr) {
+  if (send.get() == nullptr)
+  {
     std::cerr << "%s: unable to add username" << std::endl;
     return ERROR_RC;
   }
@@ -122,7 +138,8 @@ int radius_transact(const IpAddress &auth_server_ip,
   std::string challenge;
   challenge.insert(0, challenge_bytes.get(), MD5_DIGEST_SIZE);
   if (rc_avpair_add(rh.get(), &send_raw, PW_CHAP_CHALLENGE, challenge.c_str(),
-                    challenge.size(), VENDOR_NONE) == nullptr) {
+                    challenge.size(), VENDOR_NONE) == nullptr)
+  {
     std::cerr << "ERROR: cannot add CHAP challenge to packet" << std::endl;
     return ERROR_RC;
   }
@@ -145,13 +162,15 @@ int radius_transact(const IpAddress &auth_server_ip,
                   MD5_DIGEST_SIZE);
 
   if (rc_avpair_add(rh.get(), &send_raw, PW_CHAP_PASSWORD, response.c_str(),
-                    response.size(), VENDOR_NONE) == nullptr) {
+                    response.size(), VENDOR_NONE) == nullptr)
+  {
     std::cerr << "ERROR: unable to add password" << std::endl;
     return ERROR_RC;
   }
 
   if (rc_avpair_add(rh.get(), &send_raw, kSbBBMac, mac.c_str(), mac.size(),
-                    kVendorSoftbank) == nullptr) {
+                    kVendorSoftbank) == nullptr)
+  {
     std::cerr << "ERROR: unable to set MAC" << std::endl;
     return ERROR_RC;
   }
@@ -159,21 +178,24 @@ int radius_transact(const IpAddress &auth_server_ip,
   std::string manufacturer(kManufacturer);
   if (rc_avpair_add(rh.get(), &send_raw, kSbBBManufacturer,
                     manufacturer.c_str(), manufacturer.size(),
-                    kVendorSoftbank) == nullptr) {
+                    kVendorSoftbank) == nullptr)
+  {
     std::cerr << "ERROR: unable to set manufacturer" << std::endl;
     return ERROR_RC;
   }
 
   std::string model(kModel);
   if (rc_avpair_add(rh.get(), &send_raw, kSbBBModel, model.c_str(),
-                    model.size(), kVendorSoftbank) == nullptr) {
+                    model.size(), kVendorSoftbank) == nullptr)
+  {
     std::cerr << "ERROR: unable to set model" << std::endl;
     return ERROR_RC;
   }
 
   std::string hwrev(kHwRev);
   if (rc_avpair_add(rh.get(), &send_raw, kSbBBHWRev, hwrev.c_str(),
-                    hwrev.size(), kVendorSoftbank) == nullptr) {
+                    hwrev.size(), kVendorSoftbank) == nullptr)
+  {
     std::cerr << "ERROR: unable to set HW revision" << std::endl;
     return ERROR_RC;
   }
@@ -181,19 +203,22 @@ int radius_transact(const IpAddress &auth_server_ip,
   VALUE_PAIR *received;
   int result =
       rc_aaa(rh.get(), 0, send.get(), &received, nullptr, 0, PW_ACCESS_REQUEST);
-  if (result == OK_RC) {
+  if (result == OK_RC)
+  {
     unique_VALUE_PAIR vp(received);
 
     VALUE_PAIR *vp_local_address =
         rc_avpair_get(vp.get(), kSbIPv4LocalAddr, kVendorSoftbank);
-    if (vp_local_address == nullptr) {
+    if (vp_local_address == nullptr)
+    {
       std::cerr << "Local Address attribute is missing: " << kVendorSoftbank
                 << "/" << kSbIPv4LocalAddr << std::endl;
     }
 
     VALUE_PAIR *vp_tunnel_endpoint =
         rc_avpair_get(vp.get(), kSbIPv4TunnelEndpoint, kVendorSoftbank);
-    if (vp_tunnel_endpoint == nullptr) {
+    if (vp_tunnel_endpoint == nullptr)
+    {
       std::cerr << "Tunnel Endpoint attribute is missing: " << kVendorSoftbank
                 << "/" << kSbIPv4TunnelEndpoint << std::endl;
     }
@@ -205,14 +230,17 @@ int radius_transact(const IpAddress &auth_server_ip,
     if (rc_avpair_tostr(rh.get(), vp_local_address, junk, sizeof(junk),
                         local_address, sizeof(local_address)) ||
         rc_avpair_tostr(rh.get(), vp_tunnel_endpoint, junk, sizeof(junk),
-                        tunnel_endpoint, sizeof(tunnel_endpoint))) {
+                        tunnel_endpoint, sizeof(tunnel_endpoint)))
+    {
       std::cerr << "Cannot find Local IPv4 Address or Tunnel Endpoint!"
                 << std::endl;
       return ERROR_RC;
     }
 
     std::cout << local_address << " " << tunnel_endpoint << std::endl;
-  } else {
+  }
+  else
+  {
     std::cerr << username << " RADIUS Authentication failure (RC=" << result
               << ")" << std::endl;
   }
