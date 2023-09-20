@@ -89,8 +89,8 @@ desired.
          * Password is shared among all clients
    * Access-Accept (2) packet:
       1. Contains Vendor Specific Attributes (VSA)
-         * IPv4-in-IPv6 tunnel local IPv4 address (204)
-         * IPv4-in-IPv6 tunnel endpoint IPv6 address (207)
+         * IPv4-in-IPv6 tunnel CPE local IPv4 address (204)
+         * IPv4-in-IPv6 tunnel gateway IPv6 address (207)
       1. Other attributes don't appear to be useful
 1. IPv6-in-IPv4 tunnel setup
    1. Use IPv4-in-IPv6 parameters discovered in IPv6 RADIUS exchange
