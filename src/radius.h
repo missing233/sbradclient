@@ -17,10 +17,6 @@
 #ifndef _SB_CLIENT_RADIUS_H
 #define _SB_CLIENT_RADIUS_H
 
-#include "ip_address.h"
-
-int radius_transact(const IpAddress &auth_server_ip,
-                    const std::string &shared_secret, const IpAddress &username,
-                    const std::string &password, const std::string &mac);
+int radius_transact(const char *auth_server_ip, const char *shared_secret, const char *username, const char *password, const char *mac);
 
 #endif /* _SB_CLIENT_RADIUS_H */
