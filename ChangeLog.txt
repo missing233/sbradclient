@@ -1,2 +1,8 @@
 * Mon Mar 5 2018 Kenny Root <kenny@the-b.org> 1.0.0-1
 - First release.
+
+* Sat Dec 9 2023 missing233 <ms@missing233.com> 1.0.1-dev
+- Wrt ver.
+
+* Wed Oct 9 2024 missing233 <ms@missing233.com> 1.1.0-dev
+- refactor: support cross line.
