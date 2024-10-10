@@ -180,28 +180,6 @@ int sb_radius(int type, const char *auth_server_ip, const char *shared_secret,
     uint8_t challenge[16];
     create_challenge(challenge, sizeof(challenge));
 
-    // CHAP_CHALLENGE attribute
-    memset(&avps[avp_count], 0, sizeof(AVP));
-    avps[avp_count].type = PW_CHAP_CHALLENGE;
-    avps[avp_count].is_vendor = 0;
-    avps[avp_count].data = challenge;
-    avps[avp_count].data_len = sizeof(challenge);
-    avp_count++;
-
-    // CHAP_PASSWORD attribute
-    uint8_t chap_id = response;
-    uint8_t chap_response[17];
-    chap_response[0] = chap_id;
-    compute_chap_response(chap_id, password, challenge, sizeof(challenge),
-                          chap_response + 1);
-
-    memset(&avps[avp_count], 0, sizeof(AVP));
-    avps[avp_count].type = PW_CHAP_PASSWORD;
-    avps[avp_count].is_vendor = 0;
-    avps[avp_count].data = chap_response;
-    avps[avp_count].data_len = sizeof(chap_response);
-    avp_count++;
-
     // Add Vendor-Specific Attributes
     if (type == 1)
     {
@@ -241,10 +219,46 @@ int sb_radius(int type, const char *auth_server_ip, const char *shared_secret,
         avps[avp_count].data = (const uint8_t *)HwRev;
         avps[avp_count].data_len = strlen(HwRev);
         avp_count++;
+
+        // CHAP_CHALLENGE attribute
+        memset(&avps[avp_count], 0, sizeof(AVP));
+        avps[avp_count].type = PW_CHAP_CHALLENGE;
+        avps[avp_count].is_vendor = 0;
+        avps[avp_count].data = challenge;
+        avps[avp_count].data_len = sizeof(challenge);
+        avp_count++;
+
+        // CHAP_PASSWORD attribute
+        uint8_t chap_id = response;
+        uint8_t chap_response[17];
+        chap_response[0] = chap_id;
+        compute_chap_response(chap_id, password, challenge, sizeof(challenge),
+                              chap_response + 1);
+
+        memset(&avps[avp_count], 0, sizeof(AVP));
+        avps[avp_count].type = PW_CHAP_PASSWORD;
+        avps[avp_count].is_vendor = 0;
+        avps[avp_count].data = chap_response;
+        avps[avp_count].data_len = sizeof(chap_response);
+        avp_count++;
     }
     else
+    // One AVP containing multiple VSAs
     {
-        // One AVP containing multiple VSAs
+        // CHAP_PASSWORD attribute
+        uint8_t chap_id = response;
+        uint8_t chap_response[17];
+        chap_response[0] = chap_id;
+        compute_chap_response(chap_id, password, challenge, sizeof(challenge),
+                              chap_response + 1);
+
+        memset(&avps[avp_count], 0, sizeof(AVP));
+        avps[avp_count].type = PW_CHAP_PASSWORD;
+        avps[avp_count].is_vendor = 0;
+        avps[avp_count].data = chap_response;
+        avps[avp_count].data_len = sizeof(chap_response);
+        avp_count++;
+
         memset(&avps[avp_count], 0, sizeof(AVP));
         avps[avp_count].is_vendor = 1;
         avps[avp_count].vendor_id = kVendorSb;
@@ -270,6 +284,14 @@ int sb_radius(int type, const char *auth_server_ip, const char *shared_secret,
         avps[avp_count].vsas[3].data = (const uint8_t *)HwRev;
         avps[avp_count].vsas[3].data_len = strlen(HwRev);
 
+        avp_count++;
+
+        // CHAP_CHALLENGE attribute
+        memset(&avps[avp_count], 0, sizeof(AVP));
+        avps[avp_count].type = PW_CHAP_CHALLENGE;
+        avps[avp_count].is_vendor = 0;
+        avps[avp_count].data = challenge;
+        avps[avp_count].data_len = sizeof(challenge);
         avp_count++;
     }
 

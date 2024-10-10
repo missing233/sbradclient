@@ -1,4 +1,5 @@
 #include "radius_client.h"
+#include "md5.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +10,6 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include "md5.h"
 
 size_t add_attribute(uint8_t *packet, size_t offset, const AVP *avp)
 {
@@ -202,6 +202,47 @@ int radius_transact(const char *shared_secret, const AVP *avps, size_t avp_count
     if (recv_bytes < 0)
     {
         fprintf(stderr, "Error: No response from server after %d attempts.\n", max_retries);
+        close(sockfd);
+        freeaddrinfo(res);
+        return EXIT_FAILURE;
+    }
+
+    // Verify Response Authenticator
+    if (recv_bytes >= 20)
+    {
+        uint8_t recv_authenticator[16];
+        memcpy(recv_authenticator, recv_buffer + 4, 16);
+
+        // Prepare data for MD5 hash
+        uint8_t md5_data[4096];
+        memcpy(md5_data, recv_buffer, 4);                         // Code + Identifier + Length
+        memcpy(md5_data + 4, authenticator, 16);     // Request Authenticator
+        memcpy(md5_data + 20, recv_buffer + 20, recv_bytes - 20); // Attributes
+        size_t md5_data_len = recv_bytes;
+
+        // Append shared_secret
+        size_t secret_len = strlen(shared_secret);
+        memcpy(md5_data + md5_data_len, shared_secret, secret_len);
+        md5_data_len += secret_len;
+
+        // Calculate MD5 hash
+        uint8_t expected_authenticator[16];
+        MD5_CTX md5_ctx;
+        MD5_Init(&md5_ctx);
+        MD5_Update(&md5_ctx, md5_data, md5_data_len);
+        MD5_Final(expected_authenticator, &md5_ctx);
+
+        if (memcmp(recv_authenticator, expected_authenticator, 16) != 0)
+        {
+            fprintf(stderr, "Invalid Response Authenticator\n");
+            close(sockfd);
+            freeaddrinfo(res);
+            return EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "Received invalid RADIUS packet\n");
         close(sockfd);
         freeaddrinfo(res);
         return EXIT_FAILURE;
